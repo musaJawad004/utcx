@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Appearance } from 'react-native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -26,6 +27,7 @@ export default function RootLayout() {
   const [monoLoaded] = useIbmPlex({ IBMPlexMono_400Regular, IBMPlexMono_500Medium });
   const ready = spaceLoaded && monoLoaded;
   const darkMode = useAppStore((state) => state.settings.darkMode);
+  useEffect(() => { Appearance.setColorScheme(darkMode ? 'dark' : 'light'); }, [darkMode]);
   useEffect(() => { if (ready) void SplashScreen.hideAsync(); }, [ready]);
   if (!ready) return null;
   return (

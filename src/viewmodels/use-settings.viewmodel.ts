@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { Appearance } from 'react-native';
 import type { AppSettings } from '@/src/models/settings.model';
 import { haptics } from '@/src/services/haptics.service';
 import { requestCurrentCity } from '@/src/services/location.service';
@@ -16,6 +17,7 @@ export const useSettingsViewModel = () => {
 
   const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     update(key, value);
+    if (key === 'darkMode') Appearance.setColorScheme(Boolean(value) ? 'dark' : 'light');
     haptics.select(settings.haptics);
     if (key === 'liveActivity') void setLiveActivityEnabled(Boolean(value), current, saved[0]);
   };
