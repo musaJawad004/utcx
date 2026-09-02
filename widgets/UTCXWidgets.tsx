@@ -4,7 +4,7 @@ import { createLiveActivity, createWidget, type LiveActivityEnvironment, type Wi
 
 const ink = '#10100F';
 const canvas = '#F2F0EA';
-const ember = '#FF6B1A';
+const ember = '#5E6873';
 
 export type SingleClockProps = { city: string; time: string; offset: string; isDay: boolean };
 export type ThreeCityProps = { cities: Array<{ city: string; time: string; offset: string }> };

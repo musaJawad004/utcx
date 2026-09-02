@@ -9,8 +9,9 @@ export const colors = {
   glassStrong: 'rgba(255,255,252,0.9)',
   inverse: '#10100F',
   inverseText: '#F8F7F2',
-  ember: '#FF6B1A',
-  emberSoft: 'rgba(255,107,26,0.16)',
+  // Neutral slate accent keeps the instrument monochrome and works in both themes.
+  ember: '#5E6873',
+  emberSoft: 'rgba(94,104,115,0.16)',
   danger: '#C7462B',
   white: '#FFFFFF',
   transparent: 'transparent',

@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { FadeInDown, LinearTransition, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { FadeIn, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GripVertical } from 'lucide-react-native';
 import type { City } from '@/src/models/city.model';
 import { getSolarWindow } from '@/src/services/solar.service';
@@ -28,7 +28,7 @@ export function CityClockRow({ city, index, now, format, seconds, onOpen, onRemo
     .onUpdate((event) => { x.value = Math.min(0, Math.max(-116, event.translationX)); })
     .onEnd(() => {
       if (x.value < -86) { x.value = withTiming(-420, { duration: 220 }); runOnJS(onRemove)(); }
-      else x.value = withSpring(0, { damping: 20, stiffness: 220 });
+      else x.value = withTiming(0, { duration: 180 });
     });
   const drag = Gesture.Pan().activateAfterLongPress(180)
     .onStart(() => { runOnJS(onHaptic)(); })
@@ -36,13 +36,13 @@ export function CityClockRow({ city, index, now, format, seconds, onOpen, onRemo
     .onEnd(() => {
       const shift = Math.max(-index, Math.min(8, Math.round(y.value / 96)));
       if (shift) runOnJS(onReorder)(index, index + shift);
-      y.value = withSpring(0, { damping: 19, stiffness: 210 });
+      y.value = withTiming(0, { duration: 180 });
     });
   const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }, { translateY: y.value }], zIndex: y.value === 0 ? 0 : 4 }));
   const solar = getSolarWindow(city, now);
 
   return (
-    <Animated.View entering={FadeInDown.duration(420)} layout={LinearTransition.springify().damping(20)} style={styles.wrapper}>
+    <Animated.View entering={FadeIn.duration(260)} style={styles.wrapper}>
       <View style={styles.deleteRail}><Text style={styles.deleteText}>REMOVE</Text></View>
       <GestureDetector gesture={swipe}>
         <Animated.View style={[styles.row, rowStyle]}>

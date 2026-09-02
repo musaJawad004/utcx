@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Search, X } from 'lucide-react-native';
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import type { City } from '@/src/models/city.model';
 import { matchesCityQuery } from '@/src/utils/validation';
 import { formatTime, utcOffset } from '@/src/services/time.service';
@@ -24,6 +24,7 @@ type Props = {
 
 export function AddCitySheet({ visible, cities, recent, savedIds, now, format, onClose, onSelect }: Props) {
   const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
   const results = useMemo(() => cities.filter((city) => !savedIds.includes(city.id) && matchesCityQuery(city, query)), [cities, query, savedIds]);
   const suggestions = query ? results : results.filter((city) => ['new-york', 'paris', 'dubai', 'sydney', 'singapore'].includes(city.id));
   const data = query ? suggestions : [...recent.filter((city) => !savedIds.includes(city.id)), ...suggestions.filter((city) => !recent.some((item) => item.id === city.id))];
@@ -34,16 +35,16 @@ export function AddCitySheet({ visible, cities, recent, savedIds, now, format, o
         <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(160)} style={styles.backdrop}>
           <Pressable accessibilityLabel="Close city search" onPress={onClose} style={styles.backdropPress} />
         </Animated.View>
-        <Animated.View entering={SlideInDown.springify().damping(22)} exiting={SlideOutDown.duration(240)} style={styles.sheet}>
+        <Animated.View entering={FadeIn.duration(220)} exiting={FadeOut.duration(180)} style={styles.sheet}>
           <BlurView intensity={82} tint="light" style={styles.blur}>
             <View style={styles.handle} />
             <View style={styles.header}>
               <View><Text style={styles.eyebrow}>NEW COORDINATE</Text><Text style={styles.title}>Add a city</Text></View>
               <IconButton size="small" label="Close" onPress={onClose} icon={<X size={18} color={colors.ink} strokeWidth={1.7} />} />
             </View>
-            <View style={styles.searchBox}>
+            <View style={[styles.searchBox, focused && styles.searchBoxFocused]}>
               <Search size={18} color={colors.graphite} strokeWidth={1.5} />
-              <TextInput autoCapitalize="words" autoCorrect={false} clearButtonMode="while-editing" onChangeText={setQuery} placeholder="City or country" placeholderTextColor={colors.quiet} returnKeyType="search" style={styles.input} value={query} />
+              <TextInput autoCapitalize="words" autoCorrect={false} clearButtonMode="while-editing" onBlur={() => setFocused(false)} onChangeText={setQuery} onFocus={() => setFocused(true)} placeholder="City or country" placeholderTextColor={colors.quiet} returnKeyType="search" style={styles.input} value={query} />
             </View>
             <Text style={styles.section}>{query ? `${data.length} MATCH${data.length === 1 ? '' : 'ES'}` : recent.length ? 'RECENT · SUGGESTED' : 'SUGGESTED'}</Text>
             <FlatList

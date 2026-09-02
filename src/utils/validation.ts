@@ -31,4 +31,5 @@ export const sanitizeSettings = (value: Partial<AppSettings>, fallback: AppSetti
     ? value.animationIntensity!
     : fallback.animationIntensity,
   temperatureUnit: value.temperatureUnit === 'fahrenheit' ? 'fahrenheit' : 'celsius',
+  darkMode: typeof value.darkMode === 'boolean' ? value.darkMode : fallback.darkMode,
 });

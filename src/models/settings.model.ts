@@ -10,6 +10,7 @@ export type AppSettings = {
   haptics: boolean;
   animationIntensity: AnimationIntensity;
   temperatureUnit: TemperatureUnit;
+  darkMode: boolean;
 };
 
 export const defaultSettings: AppSettings = {
@@ -20,4 +21,5 @@ export const defaultSettings: AppSettings = {
   haptics: true,
   animationIntensity: 'standard',
   temperatureUnit: 'celsius',
+  darkMode: false,
 };

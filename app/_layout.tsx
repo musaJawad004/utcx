@@ -25,14 +25,15 @@ export default function RootLayout() {
   const [spaceLoaded] = useSpaceGrotesk({ SpaceGrotesk_400Regular, SpaceGrotesk_500Medium, SpaceGrotesk_600SemiBold });
   const [monoLoaded] = useIbmPlex({ IBMPlexMono_400Regular, IBMPlexMono_500Medium });
   const ready = spaceLoaded && monoLoaded;
+  const darkMode = useAppStore((state) => state.settings.darkMode);
   useEffect(() => { if (ready) void SplashScreen.hideAsync(); }, [ready]);
   if (!ready) return null;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="dark" />
+        <StatusBar style={darkMode ? 'light' : 'dark'} />
         <AppEffects />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.canvas }, animation: 'fade' }}>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: darkMode ? colors.ink : colors.canvas }, animation: 'fade' }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
           <Stack.Screen name="(tabs)" />

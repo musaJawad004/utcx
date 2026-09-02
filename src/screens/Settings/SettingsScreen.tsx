@@ -1,6 +1,6 @@
 import { Alert, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LocateFixed, RotateCcw, Shapes, Sparkles } from 'lucide-react-native';
+import { LocateFixed, Moon, RotateCcw, Shapes, Sparkles } from 'lucide-react-native';
 import { colors } from '@/src/theme';
 import { useSettingsViewModel } from '@/src/viewmodels/use-settings.viewmodel';
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader/ScreenHeader';
@@ -41,6 +41,10 @@ export function SettingsScreen() {
           <View style={styles.controlRow}><View><Text style={styles.label}>Temperature</Text><Text style={styles.detail}>Reserved for weather surfaces</Text></View><SegmentedControl options={['celsius', 'fahrenheit'] as const} value={vm.settings.temperatureUnit} onChange={(value) => vm.updateSetting('temperatureUnit', value)} labels={{ celsius: '°C', fahrenheit: '°F' }} /></View>
           <SettingAction label="Reset onboarding" onPress={vm.resetOnboarding} />
           <SettingAction label="About UTCX" value="1.0.0" onPress={() => Alert.alert('UTCX 1.0', 'A quiet world-time instrument. Timezone calculations run locally and saved cities remain available offline.')} />
+        </View>
+        <Text style={styles.sectionLabel}>APPEARANCE</Text>
+        <View style={styles.panel}>
+          <ToggleRow icon={<Moon size={18} color={colors.graphite} strokeWidth={1.5} />} label="Dark mode" detail="Use a low-light instrument palette" value={vm.settings.darkMode} onChange={(value) => vm.updateSetting('darkMode', value)} />
         </View>
         <Text style={styles.footer}>UTCX · LOCAL-FIRST WORLD TIME{`\n`}NO ACCOUNT · NO BACKGROUND TRACKING</Text>
       </ScrollView>

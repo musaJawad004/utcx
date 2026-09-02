@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   cityCountry: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, marginTop: 3, textTransform: 'uppercase', letterSpacing: 1.3 },
   cityTime: { fontFamily: fonts.sans, fontSize: 48, color: colors.ink, letterSpacing: -3.2, marginTop: spacing.md, fontVariant: ['tabular-nums'] },
   permissionVisual: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  pinHalo: { width: 210, height: 210, borderRadius: 105, backgroundColor: colors.emberSoft, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,107,26,0.35)' },
+  pinHalo: { width: 210, height: 210, borderRadius: 105, backgroundColor: colors.emberSoft, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.ember },
   pinCircle: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.glassStrong, alignItems: 'center', justifyContent: 'center' },
   coordinate: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 0.8, marginTop: spacing.lg },
   copy: { paddingBottom: spacing.xl },
