@@ -1,0 +1,32 @@
+import { StyleSheet } from 'react-native';
+import { colors, fonts, radii, screenGutter, spacing } from '@/src/theme';
+
+export const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.canvas },
+  content: { paddingHorizontal: screenGutter },
+  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  zone: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 0.7 },
+  hero: { marginTop: spacing.xl },
+  city: { fontFamily: fonts.sansMedium, fontSize: 44, lineHeight: 46, letterSpacing: -2.2, color: colors.ink },
+  country: { fontFamily: fonts.sans, fontSize: 15, color: colors.graphite, marginTop: 2 },
+  time: { fontSize: 84, letterSpacing: -7, marginTop: spacing.xl },
+  dateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.sm },
+  date: { fontFamily: fonts.mono, color: colors.graphite, fontSize: 11, textTransform: 'uppercase' },
+  offsetBadge: { fontFamily: fonts.monoMedium, color: colors.ember, fontSize: 8, letterSpacing: 0.8 },
+  solarCard: { marginTop: spacing.xl, padding: spacing.lg, borderRadius: radii.lg, backgroundColor: colors.canvasRaised, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline },
+  solarTop: { flexDirection: 'row', justifyContent: 'space-between' },
+  metaLabel: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.ember, letterSpacing: 1.4 },
+  solarState: { fontFamily: fonts.sansMedium, fontSize: 24, color: colors.ink, marginTop: 5 },
+  solarTimes: { alignItems: 'flex-end', gap: 5 },
+  solarTime: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite },
+  mapCard: { marginTop: spacing.md, borderRadius: radii.lg, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline, alignItems: 'center', backgroundColor: 'rgba(16,16,15,0.02)' },
+  mapLabel: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.sm, flexDirection: 'row', justifyContent: 'space-between' },
+  coordinate: { fontFamily: fonts.mono, fontSize: 8, color: colors.graphite },
+  compareCard: { marginTop: spacing.md, padding: spacing.lg, borderRadius: radii.lg, backgroundColor: colors.canvasRaised, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline },
+  difference: { fontFamily: fonts.sansMedium, fontSize: 24, lineHeight: 28, letterSpacing: -0.8, color: colors.ink, marginTop: spacing.sm },
+  comparison: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg },
+  compareDivider: { width: 1, height: 42, backgroundColor: colors.hairline, marginHorizontal: spacing.lg },
+  compareRight: { marginLeft: 'auto', alignItems: 'flex-end' },
+  compareCity: { fontFamily: fonts.sans, fontSize: 12, color: colors.graphite },
+  compareTime: { fontFamily: fonts.monoMedium, fontSize: 19, color: colors.ink, marginTop: 4, fontVariant: ['tabular-nums'] },
+});

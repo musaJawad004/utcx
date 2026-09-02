@@ -1,0 +1,30 @@
+import { StyleSheet } from 'react-native';
+import { colors, fonts, screenGutter, spacing } from '@/src/theme';
+
+export const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.canvas, paddingTop: 62, paddingBottom: 26, paddingHorizontal: screenGutter },
+  background: { ...StyleSheet.absoluteFill },
+  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  brand: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.ink, letterSpacing: 3 },
+  step: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 1 },
+  stage: { flex: 1, justifyContent: 'space-between' },
+  visual: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  heroTime: { position: 'absolute', fontFamily: fonts.sans, fontSize: 64, color: colors.ink, letterSpacing: -4, fontVariant: ['tabular-nums'] },
+  cityStage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  cityReadout: { position: 'absolute', alignItems: 'center', padding: spacing.md },
+  cityName: { fontFamily: fonts.sansMedium, fontSize: 30, color: colors.ink, letterSpacing: -1.4 },
+  cityCountry: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, marginTop: 3, textTransform: 'uppercase', letterSpacing: 1.3 },
+  cityTime: { fontFamily: fonts.sans, fontSize: 48, color: colors.ink, letterSpacing: -3.2, marginTop: spacing.md, fontVariant: ['tabular-nums'] },
+  permissionVisual: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  pinHalo: { width: 210, height: 210, borderRadius: 105, backgroundColor: colors.emberSoft, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,107,26,0.35)' },
+  pinCircle: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.glassStrong, alignItems: 'center', justifyContent: 'center' },
+  coordinate: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 0.8, marginTop: spacing.lg },
+  copy: { paddingBottom: spacing.xl },
+  eyebrow: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.ember, letterSpacing: 2, marginBottom: spacing.sm },
+  title: { maxWidth: 340, fontFamily: fonts.sansMedium, fontSize: 38, lineHeight: 40, letterSpacing: -1.8, color: colors.ink },
+  body: { maxWidth: 350, fontFamily: fonts.sans, fontSize: 14, lineHeight: 20, color: colors.graphite, marginTop: spacing.md },
+  footer: { gap: spacing.xs },
+  dots: { flexDirection: 'row', gap: 6, marginBottom: spacing.md },
+  dot: { width: 18, height: 2, backgroundColor: colors.hairline },
+  dotActive: { width: 36, backgroundColor: colors.ember },
+});
