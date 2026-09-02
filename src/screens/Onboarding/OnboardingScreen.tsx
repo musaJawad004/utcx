@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MapPin } from 'lucide-react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut, ZoomIn } from 'react-native-reanimated';
@@ -18,6 +19,7 @@ export function OnboardingScreen() {
   const vm = useOnboardingViewModel();
   const now = useNow(true);
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [demoIndex, setDemoIndex] = useState(0);
   useEffect(() => {
     if (vm.page !== 1) return;
@@ -28,7 +30,7 @@ export function OnboardingScreen() {
   const globeSize = Math.min(width * 0.92, height * 0.48, 430);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingTop: insets.top + 18, paddingBottom: insets.bottom + 18 }]}>
       <LinearGradient colors={[colors.canvasRaised, colors.canvas]} style={styles.background} />
       <View style={styles.top}><Text style={styles.brand}>UTCX</Text><Text style={styles.step}>0{vm.page + 1} / 03</Text></View>
       <Animated.View key={vm.page} entering={FadeIn.duration(500)} exiting={FadeOut.duration(220)} style={styles.stage}>
