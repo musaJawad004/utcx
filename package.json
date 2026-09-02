@@ -22,6 +22,7 @@
     "expo-splash-screen": "~57.0.8",
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.2",
+    "expo-system-ui": "~57.0.3",
     "expo-widgets": "~57.0.16",
     "lucide-react-native": "^1.39.0",
     "luxon": "^3.7.2",
@@ -50,7 +51,10 @@
     "web": "expo start --web",
     "prebuild": "expo prebuild",
     "typecheck": "tsc --noEmit",
-    "doctor": "expo-doctor"
+    "doctor": "expo-doctor",
+    "export:android": "expo export --platform android --output-dir .expo/export-android",
+    "export:ios": "expo export --platform ios --output-dir .expo/export-ios",
+    "widget:bundle": "node node_modules/expo-widgets/scripts/build-bundle.mjs ."
   },
   "private": true
 }

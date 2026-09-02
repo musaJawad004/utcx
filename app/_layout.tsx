@@ -9,12 +9,13 @@ import { useFonts as useIbmPlex, IBMPlexMono_400Regular, IBMPlexMono_500Medium }
 import { colors } from '@/src/theme';
 import { selectSavedCities, useAppStore } from '@/src/store/app.store';
 import { syncWidgets } from '@/src/services/widget.service';
+import { useShallow } from 'zustand/react/shallow';
 
 void SplashScreen.preventAutoHideAsync();
 
 function AppEffects() {
   const current = useAppStore((state) => state.currentCity);
-  const saved = useAppStore(selectSavedCities);
+  const saved = useAppStore(useShallow(selectSavedCities));
   const settings = useAppStore((state) => state.settings);
   useEffect(() => { syncWidgets(current, saved, settings); }, [current, saved, settings]);
   return null;

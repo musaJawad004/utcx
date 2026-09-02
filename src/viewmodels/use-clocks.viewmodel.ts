@@ -4,12 +4,13 @@ import { CITIES } from '@/src/data/cities';
 import { haptics } from '@/src/services/haptics.service';
 import { selectRecentCities, selectSavedCities, useAppStore } from '@/src/store/app.store';
 import { useNow } from '@/src/hooks/use-now';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useClocksViewModel = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
   const currentCity = useAppStore((state) => state.currentCity);
-  const savedCities = useAppStore(selectSavedCities);
-  const recentCities = useAppStore(selectRecentCities);
+  const savedCities = useAppStore(useShallow(selectSavedCities));
+  const recentCities = useAppStore(useShallow(selectRecentCities));
   const savedIds = useAppStore((state) => state.savedCityIds);
   const settings = useAppStore((state) => state.settings);
   const addCity = useAppStore((state) => state.addCity);

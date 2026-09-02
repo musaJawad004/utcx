@@ -4,11 +4,12 @@ import { haptics } from '@/src/services/haptics.service';
 import { requestCurrentCity } from '@/src/services/location.service';
 import { setLiveActivityEnabled } from '@/src/services/widget.service';
 import { selectSavedCities, useAppStore } from '@/src/store/app.store';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useSettingsViewModel = () => {
   const settings = useAppStore((state) => state.settings);
   const current = useAppStore((state) => state.currentCity);
-  const saved = useAppStore(selectSavedCities);
+  const saved = useAppStore(useShallow(selectSavedCities));
   const update = useAppStore((state) => state.updateSetting);
   const setCurrentCity = useAppStore((state) => state.setCurrentCity);
   const reset = useAppStore((state) => state.resetOnboarding);

@@ -18,7 +18,6 @@
     },
     "android": {
       "package": "com.musajawad.utcx",
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "backgroundColor": "#F2F0EA",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -42,7 +41,7 @@
         {
           "bundleIdentifier": "com.musajawad.utcx.widgets",
           "groupIdentifier": "group.com.musajawad.utcx",
-          "enableAndroid": true,
+          "enableAndroid": false,
           "enablePushNotifications": false,
           "frequentUpdates": false,
           "widgets": [
@@ -72,7 +71,8 @@
             }
           ]
         }
-      ]
+      ],
+      "./plugins/with-android-utcx-widgets"
     ],
     "experiments": { "typedRoutes": true }
   }
