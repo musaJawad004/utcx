@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   coordinate: { fontFamily: fonts.mono, color: colors.graphite, fontSize: 8, letterSpacing: 1 },
   carousel: { flexGrow: 0, marginTop: spacing.lg },
   readout: { minHeight: 120, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
-  offset: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.ember, letterSpacing: 1.1 },
+  offset: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.graphite, letterSpacing: 1.1 },
   city: { fontFamily: fonts.sansMedium, fontSize: 30, color: colors.ink, letterSpacing: -1.2, marginTop: 5 },
   country: { fontFamily: fonts.sans, fontSize: 12, color: colors.graphite },
   timeBlock: { alignItems: 'flex-end' },

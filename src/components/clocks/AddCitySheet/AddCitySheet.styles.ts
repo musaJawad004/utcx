@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   blur: { flex: 1, paddingTop: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.xl, backgroundColor: colors.glass },
   handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.quiet, alignSelf: 'center', marginBottom: spacing.lg },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  eyebrow: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.ember, letterSpacing: 1.7, marginBottom: 5 },
+  eyebrow: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.graphite, letterSpacing: 1.7, marginBottom: 5 },
   title: { fontFamily: fonts.sansMedium, fontSize: 30, color: colors.ink, letterSpacing: -1.2 },
   searchBox: { height: 54, marginTop: spacing.lg, borderRadius: radii.md, backgroundColor: colors.glassStrong, borderWidth: 1, borderColor: colors.hairline, flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, gap: spacing.sm },
   searchBoxFocused: { borderColor: colors.ember },

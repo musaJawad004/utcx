@@ -4,7 +4,7 @@ import { colors, fonts, radii, screenGutter, spacing } from '@/src/theme';
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.canvas },
   content: { paddingHorizontal: screenGutter },
-  sectionLabel: { marginTop: spacing.xl, marginBottom: spacing.xs, fontFamily: fonts.monoMedium, color: colors.ember, fontSize: 9, letterSpacing: 1.6 },
+  sectionLabel: { marginTop: spacing.xl, marginBottom: spacing.xs, fontFamily: fonts.monoMedium, color: colors.graphite, fontSize: 9, letterSpacing: 1.6 },
   panel: { borderRadius: radii.md, paddingHorizontal: spacing.md, backgroundColor: colors.canvasRaised, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline, overflow: 'hidden' },
   controlRow: { minHeight: 74, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline },
   stackedControl: { minHeight: 118, justifyContent: 'center', gap: spacing.md },

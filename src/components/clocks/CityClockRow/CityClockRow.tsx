@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { FadeIn, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { FadeIn, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GripVertical } from 'lucide-react-native';
 import type { City } from '@/src/models/city.model';
 import { getSolarWindow } from '@/src/services/solar.service';
@@ -24,12 +24,18 @@ type Props = {
 export function CityClockRow({ city, index, now, format, seconds, onOpen, onRemove, onReorder, onHaptic }: Props) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
+  const removing = useSharedValue(false);
   const swipe = Gesture.Pan().activeOffsetX([-14, 14]).failOffsetY([-10, 10])
+    .onBegin(() => { removing.value = false; })
     .onUpdate((event) => { x.value = Math.min(0, Math.max(-116, event.translationX)); })
     .onEnd(() => {
-      if (x.value < -86) { x.value = withTiming(-420, { duration: 220 }); runOnJS(onRemove)(); }
+      if (x.value < -86) {
+        removing.value = true;
+        x.value = withTiming(-420, { duration: 220 }, (finished) => { if (finished) runOnJS(onRemove)(); });
+      }
       else x.value = withTiming(0, { duration: 180 });
-    });
+    })
+    .onFinalize(() => { if (!removing.value) x.value = withTiming(0, { duration: 180 }); });
   const drag = Gesture.Pan().activateAfterLongPress(180)
     .onStart(() => { runOnJS(onHaptic)(); })
     .onUpdate((event) => { y.value = event.translationY; })
@@ -39,11 +45,12 @@ export function CityClockRow({ city, index, now, format, seconds, onOpen, onRemo
       y.value = withTiming(0, { duration: 180 });
     });
   const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }, { translateY: y.value }], zIndex: y.value === 0 ? 0 : 4 }));
+  const deleteStyle = useAnimatedStyle(() => ({ opacity: interpolate(x.value, [-86, -20, 0], [1, 0.45, 0]) }));
   const solar = getSolarWindow(city, now);
 
   return (
     <Animated.View entering={FadeIn.duration(260)} style={styles.wrapper}>
-      <View style={styles.deleteRail}><Text style={styles.deleteText}>REMOVE</Text></View>
+      <Animated.View style={[styles.deleteRail, deleteStyle]}><Text style={styles.deleteText}>REMOVE</Text></Animated.View>
       <GestureDetector gesture={swipe}>
         <Animated.View style={[styles.row, rowStyle]}>
           <Pressable accessibilityRole="button" accessibilityLabel={`Open ${city.name}`} onPress={onOpen} style={styles.content}>

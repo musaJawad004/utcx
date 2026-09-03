@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   pinCircle: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.glassStrong, alignItems: 'center', justifyContent: 'center' },
   coordinate: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 0.8, marginTop: spacing.lg },
   copy: { paddingBottom: spacing.xl },
-  eyebrow: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.ember, letterSpacing: 2, marginBottom: spacing.sm },
+  eyebrow: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.graphite, letterSpacing: 2, marginBottom: spacing.sm },
   title: { maxWidth: 340, fontFamily: fonts.sansMedium, fontSize: 38, lineHeight: 40, letterSpacing: -1.8, color: colors.ink },
   body: { maxWidth: 350, fontFamily: fonts.sans, fontSize: 14, lineHeight: 20, color: colors.graphite, marginTop: spacing.md },
   footer: { gap: spacing.xs },
