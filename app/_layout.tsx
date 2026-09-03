@@ -35,7 +35,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <StatusBar style={darkMode ? 'light' : 'dark'} />
         <AppEffects />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: darkMode ? colors.ink : colors.canvas }, animation: 'fade' }}>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.canvas }, animation: 'fade' }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
           <Stack.Screen name="(tabs)" />
