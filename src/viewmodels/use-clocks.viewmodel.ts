@@ -5,6 +5,7 @@ import { haptics } from '@/src/services/haptics.service';
 import { selectRecentCities, selectSavedCities, useAppStore } from '@/src/store/app.store';
 import { useNow } from '@/src/hooks/use-now';
 import { useShallow } from 'zustand/react/shallow';
+import type { City } from '@/src/models/city.model';
 
 export const useClocksViewModel = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
@@ -21,7 +22,7 @@ export const useClocksViewModel = () => {
   return {
     sheetVisible, setSheetVisible, currentCity, savedCities, recentCities, savedIds, settings, now, cities: CITIES,
     openCity: (id: string) => router.push({ pathname: '/city/[id]', params: { id } }),
-    add: (id: string) => { addCity(id); haptics.success(settings.haptics); setSheetVisible(false); },
+    add: (city: City) => { addCity(city); haptics.success(settings.haptics); setSheetVisible(false); router.push({ pathname: '/city/[id]', params: { id: city.id } }); },
     remove: (id: string) => { removeCity(id); haptics.impact(settings.haptics); },
     reorder: (from: number, to: number) => { reorderCity(from, Math.max(0, Math.min(savedCities.length - 1, to))); },
     pulse,

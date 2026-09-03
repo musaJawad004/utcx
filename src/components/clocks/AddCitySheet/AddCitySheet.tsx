@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import type { HourFormat } from '@/src/models/settings.model';
 import { colors } from '@/src/theme';
 import { IconButton } from '@/src/components/ui/IconButton/IconButton';
 import { styles } from './AddCitySheet.styles';
+import { searchWorldPlaces } from '@/src/services/geocoding.service';
 
 type Props = {
   visible: boolean;
@@ -26,9 +27,21 @@ type Props = {
 export function AddCitySheet({ visible, cities, recent, savedIds, now, format, onClose, onSelect }: Props) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [worldResults, setWorldResults] = useState<City[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const insets = useSafeAreaInsets();
   const results = useMemo(() => cities.filter((city) => !savedIds.includes(city.id) && matchesCityQuery(city, query)), [cities, query, savedIds]);
-  const suggestions = query ? results : results.filter((city) => ['new-york', 'paris', 'dubai', 'sydney', 'singapore'].includes(city.id));
+  useEffect(() => {
+    if (query.trim().length < 2) { setWorldResults([]); setSearching(false); setSearchError(false); return; }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setSearching(true); setSearchError(false);
+      void searchWorldPlaces(query, controller.signal).then((places) => setWorldResults(places.filter((city) => !savedIds.includes(city.id)))).catch((error: unknown) => { if (!(error instanceof Error && error.name === 'AbortError')) setSearchError(true); }).finally(() => setSearching(false));
+    }, 550);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query, savedIds]);
+  const suggestions = query ? [...results, ...worldResults.filter((remote) => !results.some((local) => local.name === remote.name && local.countryCode === remote.countryCode))] : results.filter((city) => ['new-york', 'paris', 'dubai', 'sydney', 'singapore'].includes(city.id));
   const data = query ? suggestions : [...recent.filter((city) => !savedIds.includes(city.id)), ...suggestions.filter((city) => !recent.some((item) => item.id === city.id))];
 
   return (
@@ -48,12 +61,12 @@ export function AddCitySheet({ visible, cities, recent, savedIds, now, format, o
               <Search size={18} color={colors.graphite} strokeWidth={1.5} />
               <TextInput autoCapitalize="words" autoCorrect={false} clearButtonMode="while-editing" onBlur={() => setFocused(false)} onChangeText={setQuery} onFocus={() => setFocused(true)} placeholder="City or country" placeholderTextColor={colors.quiet} returnKeyType="search" style={styles.input} value={query} />
             </View>
-            <Text style={styles.section}>{query ? `${data.length} MATCH${data.length === 1 ? '' : 'ES'}` : recent.length ? 'RECENT · SUGGESTED' : 'SUGGESTED'}</Text>
+            <Text style={styles.section}>{query ? searching ? 'SEARCHING THE WORLD…' : `${data.length} MATCH${data.length === 1 ? '' : 'ES'}` : recent.length ? 'RECENT · SUGGESTED' : 'SUGGESTED'}</Text>
             <FlatList
               data={data}
               keyboardShouldPersistTaps="handled"
               keyExtractor={(item) => item.id}
-              ListEmptyComponent={<Text style={styles.empty}>No city matches that search.</Text>}
+              ListEmptyComponent={<Text style={styles.empty}>{searchError ? 'World search is unavailable. Check your connection.' : searching ? 'Looking across cities and countries…' : 'No city or country matches that search.'}</Text>}
               renderItem={({ item }) => (
                 <Pressable accessibilityRole="button" onPress={() => { onSelect(item); setQuery(''); }} style={({ pressed }) => [styles.result, pressed && styles.resultPressed]}>
                   <View><Text style={styles.city}>{item.name}</Text><Text style={styles.country}>{item.country} · {utcOffset(item, now)}</Text></View>

@@ -21,7 +21,7 @@ export function WorldScreen() {
     <View style={[styles.screen, { paddingTop: insets.top + 12, paddingBottom: 116 + (Platform.OS === 'ios' ? insets.bottom : 0) }]}>
       <ScreenHeader eyebrow="LONGITUDE FIELD" title="World" />
       <Animated.View entering={FadeInDown.duration(600)} style={styles.mapCard}>
-        <WorldField width={mapWidth} height={mapHeight} cities={vm.cities} selected={vm.selected} />
+        <WorldField width={mapWidth} height={mapHeight} cities={vm.cities} selected={vm.selected} dark={vm.settings.darkMode} zoom={0} />
         <View style={styles.coordinates}><Text style={styles.coordinate}>{vm.selected.latitude.toFixed(2)}°</Text><Text style={styles.coordinate}>{vm.selected.longitude.toFixed(2)}°</Text></View>
       </Animated.View>
       <FlatList

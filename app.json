@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "utcx",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
@@ -34,6 +34,7 @@
     "plugins": [
       "expo-router",
       "expo-font",
+      "@maplibre/maplibre-react-native",
       ["expo-splash-screen", { "backgroundColor": "#F2F0EA", "image": "./assets/splash-icon.png", "imageWidth": 92 }],
       ["expo-location", { "locationWhenInUsePermission": "UTCX uses your location to identify your current city and timezone." }],
       [

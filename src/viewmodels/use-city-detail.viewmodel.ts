@@ -9,8 +9,9 @@ export const useCityDetailViewModel = (id: string) => {
   const [hourOffset, setHourOffset] = useState(0);
   const current = useAppStore((state) => state.currentCity);
   const settings = useAppStore((state) => state.settings);
+  const customCities = useAppStore((state) => state.customCities ?? []);
   const now = useNow(settings.showSeconds);
-  const city = cityById(id) ?? current;
+  const city = cityById(id) ?? customCities.find((item) => item.id === id) ?? current;
   const comparedAt = useMemo(() => new Date(now.getTime() + hourOffset * 3_600_000), [now, hourOffset]);
   return { city, current, settings, now: comparedAt, liveNow: now, hourOffset, setHourOffset, solar: getSolarWindow(city, comparedAt), difference: describeDifference(current, city, comparedAt) };
 };

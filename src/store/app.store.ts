@@ -11,11 +11,12 @@ type AppState = {
   currentCity: City;
   savedCityIds: string[];
   recentCityIds: string[];
+  customCities: City[];
   settings: AppSettings;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
   setCurrentCity: (city: City) => void;
-  addCity: (id: string) => void;
+  addCity: (city: City) => void;
   removeCity: (id: string) => void;
   reorderCity: (from: number, to: number) => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
@@ -28,13 +29,15 @@ export const useAppStore = create<AppState>()(
       currentCity: systemCity(),
       savedCityIds: DEFAULT_CITY_IDS,
       recentCityIds: [],
+      customCities: [],
       settings: defaultSettings,
       completeOnboarding: () => set({ onboardingComplete: true }),
       resetOnboarding: () => set({ onboardingComplete: false }),
       setCurrentCity: (currentCity) => set({ currentCity }),
-      addCity: (id) => set((state) => ({
-        savedCityIds: state.savedCityIds.includes(id) ? state.savedCityIds : [...state.savedCityIds, id],
-        recentCityIds: [id, ...state.recentCityIds.filter((item) => item !== id)].slice(0, 5),
+      addCity: (city) => set((state) => ({
+        customCities: CITIES.some((item) => item.id === city.id) || state.customCities.some((item) => item.id === city.id) ? state.customCities : [...state.customCities, city],
+        savedCityIds: state.savedCityIds.includes(city.id) ? state.savedCityIds : [...state.savedCityIds, city.id],
+        recentCityIds: [city.id, ...state.recentCityIds.filter((item) => item !== city.id)].slice(0, 5),
       })),
       removeCity: (id) => set((state) => ({ savedCityIds: state.savedCityIds.filter((item) => item !== id) })),
       reorderCity: (from, to) => set((state) => {
@@ -50,13 +53,13 @@ export const useAppStore = create<AppState>()(
     {
       name: 'utcx-state-v1',
       storage: createJSONStorage(() => zustandStorage),
-      partialize: ({ onboardingComplete, currentCity, savedCityIds, recentCityIds, settings }) => ({ onboardingComplete, currentCity, savedCityIds, recentCityIds, settings }),
+      partialize: ({ onboardingComplete, currentCity, savedCityIds, recentCityIds, customCities, settings }) => ({ onboardingComplete, currentCity, savedCityIds, recentCityIds, customCities, settings }),
     },
   ),
 );
 
 export const selectSavedCities = (state: AppState) =>
-  state.savedCityIds.map((id) => cityById(id)).filter((city): city is City => Boolean(city));
+  state.savedCityIds.map((id) => cityById(id) ?? (state.customCities ?? []).find((city) => city.id === id)).filter((city): city is City => Boolean(city));
 
 export const selectRecentCities = (state: AppState) =>
-  state.recentCityIds.map((id) => CITIES.find((city) => city.id === id)).filter((city): city is City => Boolean(city));
+  state.recentCityIds.map((id) => CITIES.find((city) => city.id === id) ?? (state.customCities ?? []).find((city) => city.id === id)).filter((city): city is City => Boolean(city));

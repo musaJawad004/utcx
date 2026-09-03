@@ -10,7 +10,7 @@ import { CompareScrubber } from '@/src/components/detail/CompareScrubber/Compare
 import { IconButton } from '@/src/components/ui/IconButton/IconButton';
 import { TimeDigits } from '@/src/components/ui/TimeDigits/TimeDigits';
 import { DayArc } from '@/src/components/visual/DayArc/DayArc';
-import { OrbitGlobe } from '@/src/components/visual/OrbitGlobe/OrbitGlobe';
+import { WorldField } from '@/src/components/visual/WorldField/WorldField';
 import { styles } from './CityDetailScreen.styles';
 
 export function CityDetailScreen({ id }: { id: string }) {
@@ -33,7 +33,7 @@ export function CityDetailScreen({ id }: { id: string }) {
           <DayArc width={contentWidth - 48} progress={dayProgress} />
         </View>
         <View style={styles.mapCard}>
-          <OrbitGlobe size={Math.min(contentWidth - 20, 330)} accentLongitude={vm.city.longitude} />
+          <WorldField width={contentWidth} height={280} cities={[vm.city]} selected={vm.city} dark={vm.settings.darkMode} />
           <View style={styles.mapLabel}><Text style={styles.coordinate}>{vm.city.latitude.toFixed(4)}°</Text><Text style={styles.coordinate}>{vm.city.longitude.toFixed(4)}°</Text></View>
         </View>
         <View style={styles.compareCard}>

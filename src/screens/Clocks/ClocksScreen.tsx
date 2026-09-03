@@ -52,7 +52,7 @@ export function ClocksScreen() {
           {!vm.savedCities.length && <Text style={styles.empty}>No saved cities yet. Tap + to add your first coordinate.</Text>}
         </View>
       </ScrollView>
-      <AddCitySheet visible={vm.sheetVisible} cities={vm.cities} recent={vm.recentCities} savedIds={vm.savedIds} now={vm.now} format={vm.settings.hourFormat} onClose={() => vm.setSheetVisible(false)} onSelect={(city) => vm.add(city.id)} />
+      <AddCitySheet visible={vm.sheetVisible} cities={vm.cities} recent={vm.recentCities} savedIds={vm.savedIds} now={vm.now} format={vm.settings.hourFormat} onClose={() => vm.setSheetVisible(false)} onSelect={vm.add} />
     </View>
   );
 }
