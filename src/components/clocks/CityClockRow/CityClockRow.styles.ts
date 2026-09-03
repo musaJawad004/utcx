@@ -3,6 +3,7 @@ import { colors, fonts, spacing } from '@/src/theme';
 
 export const styles = StyleSheet.create({
   wrapper: { minHeight: 94, overflow: 'hidden', borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline },
+  wrapperDragging: { zIndex: 6, elevation: 6 },
   deleteRail: { ...StyleSheet.absoluteFill, backgroundColor: colors.ink, alignItems: 'flex-end', justifyContent: 'center', paddingRight: spacing.lg },
   deleteText: { color: colors.inverseText, fontFamily: fonts.monoMedium, fontSize: 10, letterSpacing: 1.6 },
   row: { minHeight: 94, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.canvas },

@@ -9,6 +9,7 @@ import type { City } from '@/src/models/city.model';
 
 export const useClocksViewModel = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const currentCity = useAppStore((state) => state.currentCity);
   const savedCities = useAppStore(useShallow(selectSavedCities));
   const recentCities = useAppStore(useShallow(selectRecentCities));
@@ -20,11 +21,13 @@ export const useClocksViewModel = () => {
   const now = useNow(settings.showSeconds);
   const pulse = () => { haptics.select(settings.haptics); };
   return {
-    sheetVisible, setSheetVisible, currentCity, savedCities, recentCities, savedIds, settings, now, cities: CITIES,
+    sheetVisible, setSheetVisible, draggingId, currentCity, savedCities, recentCities, savedIds, settings, now, cities: CITIES,
     openCity: (id: string) => router.push({ pathname: '/city/[id]', params: { id } }),
     add: (city: City) => { addCity(city); haptics.success(settings.haptics); setSheetVisible(false); router.push({ pathname: '/city/[id]', params: { id: city.id } }); },
     remove: (id: string) => { removeCity(id); haptics.impact(settings.haptics); },
     reorder: (from: number, to: number) => { reorderCity(from, Math.max(0, Math.min(savedCities.length - 1, to))); },
+    startDragging: (id: string) => setDraggingId(id),
+    stopDragging: () => setDraggingId(null),
     pulse,
   };
 };

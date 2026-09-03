@@ -47,7 +47,7 @@ export function ClocksScreen() {
         <View style={styles.listHeader}><Text style={styles.listTitle}>SAVED CITIES</Text><Text style={styles.listHint}>SWIPE TO REMOVE · HOLD ⠿ TO REORDER</Text></View>
         <View style={styles.list}>
           {vm.savedCities.map((city, index) => (
-            <CityClockRow key={city.id} city={city} index={index} now={vm.now} format={vm.settings.hourFormat} seconds={vm.settings.showSeconds} onOpen={() => vm.openCity(city.id)} onRemove={() => vm.remove(city.id)} onReorder={vm.reorder} onHaptic={vm.pulse} />
+            <CityClockRow key={city.id} city={city} index={index} now={vm.now} format={vm.settings.hourFormat} seconds={vm.settings.showSeconds} isDragging={vm.draggingId === city.id} isDimmed={vm.draggingId !== null && vm.draggingId !== city.id} onOpen={() => vm.openCity(city.id)} onRemove={() => vm.remove(city.id)} onReorder={vm.reorder} onDragStart={() => vm.startDragging(city.id)} onDragEnd={vm.stopDragging} onHaptic={vm.pulse} />
           ))}
           {!vm.savedCities.length && <Text style={styles.empty}>No saved cities yet. Tap + to add your first coordinate.</Text>}
         </View>

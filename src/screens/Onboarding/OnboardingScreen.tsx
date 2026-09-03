@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Text, View, useColorScheme, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MapPin } from 'lucide-react-native';
@@ -19,6 +19,7 @@ export function OnboardingScreen() {
   const vm = useOnboardingViewModel();
   const now = useNow(true);
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const [demoIndex, setDemoIndex] = useState(0);
   useEffect(() => {
@@ -31,7 +32,10 @@ export function OnboardingScreen() {
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 18, paddingBottom: insets.bottom + 18 }]}>
-      <LinearGradient colors={[colors.canvasRaised, colors.canvas]} style={styles.background} />
+      <LinearGradient
+        colors={colorScheme === 'dark' ? ['#1D1D1B', '#10100F'] : ['#F8F7F2', '#F2F0EA']}
+        style={styles.background}
+      />
       <View style={styles.top}><Text style={styles.brand}>UTCX</Text><Text style={styles.step}>0{vm.page + 1} / 03</Text></View>
       <Animated.View key={vm.page} entering={FadeIn.duration(500)} exiting={FadeOut.duration(220)} style={styles.stage}>
         {vm.page === 0 && <>
@@ -50,7 +54,7 @@ export function OnboardingScreen() {
           <View style={styles.copy}><Text style={styles.eyebrow}>SHIFT PERSPECTIVE</Text><Text style={styles.title}>Follow the sun across the world.</Text><Text style={styles.body}>Saved cities update continuously, even offline.</Text></View>
         </>}
         {vm.page === 2 && <>
-          <View style={styles.permissionVisual}><View style={styles.pinHalo}><View style={styles.pinCircle}><MapPin size={34} color={colors.ember} strokeWidth={1.4} /></View></View><Text style={styles.coordinate}>40.7128° N  ·  74.0060° W</Text></View>
+          <View style={styles.permissionVisual}><View style={styles.pinHalo}><View style={styles.pinCircle}><MapPin size={34} color={colors.ink} strokeWidth={1.4} /></View></View><Text style={styles.coordinate}>40.7128° N  ·  74.0060° W</Text></View>
           <View style={styles.copy}><Text style={styles.eyebrow}>CURRENT COORDINATE</Text><Text style={styles.title}>Start where you are.</Text><Text style={styles.body}>Allow location once to label your city and timezone automatically. UTCX never tracks you in the background.</Text></View>
         </>}
       </Animated.View>

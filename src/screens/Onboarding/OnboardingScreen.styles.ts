@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   cityCountry: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, marginTop: 3, textTransform: 'uppercase', letterSpacing: 1.3 },
   cityTime: { fontFamily: fonts.sans, fontSize: 48, color: colors.ink, letterSpacing: -3.2, marginTop: spacing.md, fontVariant: ['tabular-nums'] },
   permissionVisual: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  pinHalo: { width: 210, height: 210, borderRadius: 105, backgroundColor: colors.emberSoft, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.ember },
+  pinHalo: { width: 210, height: 210, borderRadius: 105, backgroundColor: colors.emberSoft, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.ink },
   pinCircle: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.glassStrong, alignItems: 'center', justifyContent: 'center' },
   coordinate: { fontFamily: fonts.mono, fontSize: 10, color: colors.graphite, letterSpacing: 0.8, marginTop: spacing.lg },
   copy: { paddingBottom: spacing.xl },
@@ -26,5 +26,5 @@ export const styles = StyleSheet.create({
   footer: { gap: spacing.xs },
   dots: { flexDirection: 'row', gap: 6, marginBottom: spacing.md },
   dot: { width: 18, height: 2, backgroundColor: colors.hairline },
-  dotActive: { width: 36, backgroundColor: colors.ember },
+  dotActive: { width: 36, backgroundColor: colors.ink },
 });
