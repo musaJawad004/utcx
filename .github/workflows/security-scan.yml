@@ -1,0 +1,263 @@
+name: Security Scan
+
+# Five checks on every push and pull request, with standard tools. Read-only:
+# a finding fails its check and names the file; nothing in the repository is
+# ever changed by this workflow.
+#
+#   1. .vscode folder       every file; auto-run and hidden tasks; scripts,
+#                           binaries or assets kept there
+#   2. Fonts, images, media the real file type against the extension; code
+#                           hidden inside a font, image or media file
+#   3. Antivirus            ClamAV over every file in the repository
+#   4. Dependencies         install scripts, lockfile download hosts, and
+#                           OSV-Scanner across npm, yarn, pnpm, Flutter/Dart,
+#                           CocoaPods, Gradle, pip, Composer and more
+#   5. Hidden code          dropper signatures, whitespace-padded payloads,
+#                           oversized lines in build configs
+#
+# A repository whose own tooling must contain these strings (a malware scanner,
+# say) lists those paths in .security-scan-ignore, one path per line. The
+# ignored paths are printed in every run.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IGNORE_FILE: .security-scan-ignore
+  SELF: .github/workflows/security-scan.yml
+
+jobs:
+  vscode:
+    name: 1. .vscode folder
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check every file under .vscode
+        shell: bash
+        run: |
+          set -uo pipefail
+          list_files() {
+            git ls-files | grep -vxF "$SELF" | if [ -f "$IGNORE_FILE" ]; then grep -vxF -f <(grep -vE '^[[:space:]]*(#|$)' "$IGNORE_FILE"); else cat; fi
+          }
+          [ -f "$IGNORE_FILE" ] && echo "Ignoring: $(grep -vE '^[[:space:]]*(#|$)' "$IGNORE_FILE" | tr '\n' ' ')"
+          files=$(list_files | grep -E '(^|/)\.vscode/' || true)
+          if [ -z "$files" ]; then echo "No .vscode folder in this commit."; exit 0; fi
+          fail=0
+          err() { echo "::error file=$1::$2"; echo "FOUND  $1: $2"; fail=1; }
+          while IFS= read -r f; do
+            echo "checking $f"
+            case "${f,,}" in
+              *.js|*.cjs|*.mjs|*.ts|*.sh|*.py|*.ps1|*.bat|*.cmd|*.exe|*.bin|*.dll|*.so|*.dylib|*.woff|*.woff2|*.ttf|*.otf|*.eot|*.png|*.jpg|*.jpeg|*.gif|*.ico)
+                err "$f" "A script, binary or asset inside .vscode, where editors only keep settings" ;;
+            esac
+            if grep -qaE "global\.i *= *['\"\`]A[0-9]|global\[['\"\`]!['\"\`]\] *= *['\"\`]8-|eth_getTransactionCount|child_process" "$f"; then
+              err "$f" "Dropper code inside a .vscode file"
+            fi
+            case "$f" in
+              *tasks.json)
+                if grep -qE '"runOn"[[:space:]]*:[[:space:]]*"folderOpen"' "$f"; then
+                  err "$f" "A task runs by itself as soon as the folder is opened"
+                fi
+                if grep -qiE '\.(woff2?|ttf|otf|eot|png|jpe?g|gif|ico|svg|mp3|mp4)\b' "$f" && grep -qiE '\b(node|nodejs|python3?|bash|sh|zsh|curl|wget|powershell|pwsh)\b' "$f"; then
+                  err "$f" "A task executes a font, image or media file"
+                fi
+                if grep -qE '"hide"[[:space:]]*:[[:space:]]*true' "$f" && grep -qE '"reveal"[[:space:]]*:[[:space:]]*"never"' "$f"; then
+                  err "$f" "A hidden task that never shows its terminal"
+                fi ;;
+              *launch.json)
+                if grep -qiE '"(program|runtimeExecutable|runtimeArgs)"[^\n]*\.(woff2?|ttf|otf|png|jpe?g|gif|ico)' "$f"; then
+                  err "$f" "A launch configuration runs a font or image file"
+                fi ;;
+              *settings.json)
+                if grep -qE '"task\.allowAutomaticTasks"[[:space:]]*:[[:space:]]*"on"' "$f"; then
+                  err "$f" "Automatic tasks are switched on, so folder-open tasks run without asking"
+                fi
+                if grep -qE '"terminal\.integrated\.[^"]*(args|env|profiles)[^"]*"' "$f" && grep -qiE '\b(node|curl|wget|bash -c|sh -c|powershell)\b' "$f"; then
+                  err "$f" "Terminal settings make every new terminal run a command"
+                fi ;;
+            esac
+          done <<< "$files"
+          [ "$fail" = 0 ] && echo "RESULT: .vscode folder is clean"
+          exit $fail
+
+  assets:
+    name: 2. Fonts, images and media
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Compare every asset's real type with its extension
+        shell: bash
+        run: |
+          set -uo pipefail
+          list_files() {
+            git ls-files | grep -vxF "$SELF" | if [ -f "$IGNORE_FILE" ]; then grep -vxF -f <(grep -vE '^[[:space:]]*(#|$)' "$IGNORE_FILE"); else cat; fi
+          }
+          fail=0; checked=0
+          err() { echo "::error file=$1::$2"; echo "FOUND  $1: $2"; fail=1; }
+          while IFS= read -r f; do
+            [ -f "$f" ] && [ -s "$f" ] || continue
+            checked=$((checked + 1))
+            ext="${f##*.}"; ext="${ext,,}"
+            mime=$(file --brief --mime-type "$f")
+            if [ "$ext" = "svg" ]; then
+              if grep -qiE '<script|javascript:|on(load|error)=|global\.i *=|child_process' "$f"; then
+                err "$f" "An SVG that carries script"
+              fi
+              continue
+            fi
+            case "$mime" in
+              text/*|application/javascript|application/x-javascript|application/json|application/x-sh|application/x-shellscript)
+                err "$f" "Named .$ext but it is $mime: code or text disguised as a font, image or media file" ;;
+            esac
+            if grep -qaE "global\.i *= *['\"\`]A[0-9]|global\[['\"\`]!['\"\`]\] *= *['\"\`]8-|child_process|eth_getTransactionCount|eth_getBlockByNumber|require\(['\"\`](http|https|net)['\"\`]\)" "$f"; then
+              err "$f" "JavaScript dropper code inside a .$ext file"
+            fi
+          done < <(list_files | grep -iE '\.(woff2?|ttf|otf|eot|png|jpe?g|gif|webp|ico|bmp|tiff?|svg|mp3|mp4|m4a|mov|wav|ogg|webm|pdf)$')
+          echo "Checked $checked font, image and media files."
+          [ "$fail" = 0 ] && echo "RESULT: every asset is what its extension says"
+          exit $fail
+
+  antivirus:
+    name: 3. Antivirus (ClamAV) on every file
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Scan the whole repository with ClamAV
+        shell: bash
+        run: |
+          set -uo pipefail
+          docker run --rm --entrypoint clamscan \
+            -v "$GITHUB_WORKSPACE:/scandir:ro" \
+            clamav/clamav:stable \
+            --recursive --infected --exclude-dir='^/scandir/\.git$' /scandir
+          code=$?
+          case "$code" in
+            0) echo "RESULT: ClamAV found nothing" ;;
+            1) echo "::error::ClamAV found infected files (listed above)"; exit 1 ;;
+            *) echo "::error::ClamAV could not complete the scan (exit $code)"; exit 1 ;;
+          esac
+
+  dependencies:
+    name: 4. Dependencies (npm, yarn, Flutter, CocoaPods, Gradle ...)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install scripts and lockfile sources
+        shell: bash
+        run: |
+          set -uo pipefail
+          fail=0
+          err() { echo "::error file=$1::$2"; echo "FOUND  $1: $2"; fail=1; }
+          while IFS= read -r f; do
+            bad=$(jq -r '(.scripts // {}) | to_entries[]
+              | select(.key | test("^(pre|post)?install$|^prepare$|^prepack$|^postpack$|^prepublish(Only)?$"))
+              | select(.value | test("curl|wget|base64|\\beval\\b|node +-e|https?://|powershell|\\.(woff2?|ttf|otf|png|jpe?g|gif|ico|svg)"; "i"))
+              | "\(.key): \(.value)"' "$f" 2>/dev/null || true)
+            [ -n "$bad" ] && err "$f" "Install script runs something risky: $bad"
+          done < <(git ls-files | grep -E '(^|/)package\.json$')
+          while IFS= read -r f; do
+            hosts=$(grep -oE '(resolved|tarball)"?:? *"?https?://[^/" ]+' "$f" | sed -E 's#.*https?://##' | sort -u \
+              | grep -vxE 'registry\.yarnpkg\.com|registry\.npmjs\.org' || true)
+            [ -n "$hosts" ] && err "$f" "Packages downloaded from outside the npm registry: $(echo $hosts)"
+          done < <(git ls-files | grep -E '(^|/)(yarn\.lock|package-lock\.json|pnpm-lock\.yaml|npm-shrinkwrap\.json)$')
+          [ "$fail" = 0 ] && echo "RESULT: install scripts and lockfile sources are clean"
+          exit $fail
+
+      - name: OSV-Scanner (malicious and vulnerable packages, every ecosystem)
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          curl -fsSL -o /tmp/osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner_linux_amd64
+          chmod +x /tmp/osv-scanner
+          /tmp/osv-scanner --version
+          if /tmp/osv-scanner --version 2>&1 | grep -qE 'version: ?1\.'; then
+            /tmp/osv-scanner --recursive --format json . > /tmp/osv.json
+          else
+            /tmp/osv-scanner scan source --recursive --format json . > /tmp/osv.json
+          fi
+          code=$?
+          if [ ! -s /tmp/osv.json ] || ! jq -e . /tmp/osv.json > /dev/null 2>&1; then
+            if [ "$code" = 128 ]; then echo "No package manifests or lockfiles to check."; exit 0; fi
+            echo "::error::OSV-Scanner did not produce a report (exit $code)"; exit 1
+          fi
+          malicious=$(jq -r '[.results[]?.packages[]? | .package as $p | .vulnerabilities[]? | select(.id | startswith("MAL-")) | "\($p.name)@\($p.version) \(.id)"] | unique[]' /tmp/osv.json)
+          vulns=$(jq '[.results[]?.packages[]?.vulnerabilities[]?] | length' /tmp/osv.json)
+          if [ -n "$malicious" ]; then
+            echo "$malicious" | while read -r line; do echo "::error::Known malicious package: $line"; done
+            exit 1
+          fi
+          if [ "$vulns" != "0" ]; then
+            echo "::warning::$vulns known vulnerabilities in dependencies (not malware). Run osv-scanner locally for the list."
+            jq -r '.results[]?.packages[]? | "\(.package.name)@\(.package.version): \([.vulnerabilities[]?.id] | join(", "))"' /tmp/osv.json | head -50
+          fi
+          echo "RESULT: no known malicious packages"
+
+  code:
+    name: 5. Hidden code in source and configs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Signatures, padded payloads and oversized config lines
+        shell: bash
+        run: |
+          set -uo pipefail
+          list_files() {
+            git ls-files | grep -vxF "$SELF" | if [ -f "$IGNORE_FILE" ]; then grep -vxF -f <(grep -vE '^[[:space:]]*(#|$)' "$IGNORE_FILE"); else cat; fi
+          }
+          [ -f "$IGNORE_FILE" ] && echo "Ignoring: $(grep -vE '^[[:space:]]*(#|$)' "$IGNORE_FILE" | tr '\n' ' ')"
+          list_files | grep -iE '\.(js|cjs|mjs|ts|cts|mts|tsx|jsx|dart|json|html?|vue|svelte|py|sh|ya?ml|gradle|kts?|swift|java|php|rb|go|xml|plist|ps1|bat|cmd)$' \
+            | grep -viE '\.min\.[cm]?js$|\.map$|(^|/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|pubspec\.lock|Podfile\.lock)$' > /tmp/files.txt || true
+          echo "Checking $(wc -l < /tmp/files.txt) source and config files."
+          [ -s /tmp/files.txt ] || { echo "RESULT: no source files"; exit 0; }
+          fail=0
+          report() {
+            while IFS= read -r hit; do
+              file="${hit%%:*}"; rest="${hit#*:}"; line="${rest%%:*}"
+              echo "::error file=$file,line=$line::$1"
+              echo "FOUND  $file:$line  $1"
+              fail=1
+            done
+          }
+          report "Injected dropper marker" < <(tr '\n' '\0' < /tmp/files.txt | xargs -0 grep -nIE \
+            -e "global\.i *= *['\"\`]A[0-9]" -e "global\[['\"\`]!['\"\`]\] *= *['\"\`]8-" \
+            -e 'wuqktamceigynzbosdctpusocrjhrflovnxrt' -e 'run_loader|_global\._H2' 2>/dev/null | cut -c1-300)
+          report "spawn('-e') dropper" < <(tr '\n' '\0' < /tmp/files.txt | xargs -0 grep -nIE "spawn\([^)]{0,60}['\"\`]-e['\"\`]" 2>/dev/null | cut -c1-300)
+          report "Code hidden after a long run of whitespace" < <(tr '\n' '\0' < /tmp/files.txt | xargs -0 grep -nIP '[ \t]{150,}[^ \t\r]' 2>/dev/null | cut -c1-300)
+          for f in $(tr '\n' '\0' < /tmp/files.txt | xargs -0 grep -lIE 'eth_getTransactionCount|eth_getBlockByNumber|api\.trongrid\.io' 2>/dev/null); do
+            if grep -qE "child_process|spawn\(|detached *:" "$f"; then
+              echo "::error file=$f::Blockchain lookup plus process spawn, how the dropper finds and starts its second stage"
+              echo "FOUND  $f: blockchain lookup plus process spawn"
+              fail=1
+            fi
+          done
+          while IFS= read -r f; do
+            long=$(awk 'length($0) > 2000 { print NR ":" length($0); exit }' "$f")
+            if [ -n "$long" ]; then
+              echo "::error file=$f,line=${long%%:*}::A ${long#*:}-character line in a build config"
+              echo "FOUND  $f:${long%%:*}  a ${long#*:}-character line in a build config"
+              fail=1
+            fi
+          done < <(grep -iE '(^|/)((vite|vitest|postcss|babel|eslint|metro|tailwind|next|webpack|rollup|jest|nuxt|svelte|astro|app|expo|craco)\.config\.[cm]?[jt]s|\.babelrc(\.js)?|\.eslintrc(\.c?js)?|gulpfile\.js|Gruntfile\.js)$' /tmp/files.txt)
+          [ "$fail" = 0 ] && echo "RESULT: no hidden code found"
+          exit $fail
