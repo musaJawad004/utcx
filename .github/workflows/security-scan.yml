@@ -145,7 +145,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           source /tmp/sec/lib.sh
           files=$(list_files | grep -E '(^|/)\.vscode/' || true)
           if [ -z "$files" ]; then echo "RESULT: no .vscode folder"; exit 0; fi
@@ -187,7 +188,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           source /tmp/sec/lib.sh
           checked=0
           while IFS= read -r f; do
@@ -218,7 +220,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           source /tmp/sec/lib.sh
           docker run --rm --entrypoint clamscan -v "$GITHUB_WORKSPACE:/scandir:ro" clamav/clamav:stable \
             --recursive --infected --no-summary --exclude-dir='^/scandir/\.git$' /scandir > /tmp/sec/clam.txt 2> /tmp/sec/clam.err
@@ -246,7 +249,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           source /tmp/sec/lib.sh
           lifecycle='^(pre|post)?install$|^prepare$|^prepack$|^postpack$|^prepublish(Only)?$'
           removable='\.(woff2?|ttf|otf|eot|png|jpe?g|gif|ico|svg)|(curl|wget)[^|]*\|[[:space:]]*(ba|z)?sh|node +-e|base64 +(-d|--decode)|\beval\b'
@@ -299,7 +303,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           source /tmp/sec/lib.sh
           list_files | grep -iE '\.(js|cjs|mjs|ts|cts|mts|tsx|jsx|dart|json|html?|vue|svelte|py|sh|ya?ml|gradle|kts?|swift|java|php|rb|go|xml|plist|ps1|bat|cmd)$' \
             | grep -viE '\.min\.[cm]?js$|\.map$|(^|/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|pubspec\.lock|Podfile\.lock)$' \
@@ -342,7 +347,8 @@ jobs:
         if: always() && env.FIX == '1'
         shell: bash
         run: |
-          set -uo pipefail
+          # GitHub starts steps with `bash -e`; a search that finds nothing must not end the step.
+          set +e -uo pipefail
           if [ -z "$(git status --porcelain)" ]; then echo "Nothing needed fixing."; exit 0; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -354,8 +360,8 @@ jobs:
             echo
             sed 's/^/- /' /tmp/sec/fixed
           } > /tmp/sec/message.txt
-          git commit -q -F /tmp/sec/message.txt
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git commit -q -F /tmp/sec/message.txt || { echo "::error::Could not commit the fixes"; exit 1; }
+          git push origin "HEAD:${GITHUB_REF_NAME}" || { echo "::error::Could not push the fixes to ${GITHUB_REF_NAME}"; exit 1; }
           echo "Fixes pushed to ${GITHUB_REF_NAME}."
 
       - name: Result
